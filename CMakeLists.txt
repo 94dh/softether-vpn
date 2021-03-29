@@ -31,7 +31,7 @@ endif()
 
 if(UNIX)
   include(GNUInstallDirs)
-
+  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
   include(CheckIncludeFile)
   Check_Include_File(sys/auxv.h HAVE_SYS_AUXV)
   if(EXISTS "/lib/systemd/system")
