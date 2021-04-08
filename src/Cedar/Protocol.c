@@ -5,9 +5,42 @@
 // Protocol.c
 // SoftEther protocol related routines
 
-#include "CedarPch.h"
+#include "Protocol.h"
 
-static UCHAR ssl_packet_start[3] = {0x17, 0x03, 0x00};
+#include "Admin.h"
+#include "Client.h"
+#include "CM.h"
+#include "DDNS.h"
+#include "Hub.h"
+#include "IPC.h"
+#include "Link.h"
+#include "Logging.h"
+#include "Proto_IPsec.h"
+#include "Proto_OpenVPN.h"
+#include "Proto_PPP.h"
+#include "Proto_SSTP.h"
+#include "Radius.h"
+#include "Sam.h"
+#include "Server.h"
+#include "UdpAccel.h"
+#include "VLanUnix.h"
+#include "WaterMark.h"
+#include "WebUI.h"
+#include "WinUi.h"
+#include "Wpc.h"
+
+#include "Mayaqua/Cfg.h"
+#include "Mayaqua/FileIO.h"
+#include "Mayaqua/Internat.h"
+#include "Mayaqua/Memory.h"
+#include "Mayaqua/Microsoft.h"
+#include "Mayaqua/Object.h"
+#include "Mayaqua/OS.h"
+#include "Mayaqua/Pack.h"
+#include "Mayaqua/Secure.h"
+#include "Mayaqua/Str.h"
+#include "Mayaqua/Table.h"
+#include "Mayaqua/Tick64.h"
 
 // Download and save intermediate certificates if necessary
 bool DownloadAndSaveIntermediateCertificatesIfNecessary(X *x)
@@ -2084,7 +2117,7 @@ bool ServerAccept(CONNECTION *c)
 				if (is_empty_password)
 				{
 					const SOCK *s = c->FirstSock;
-					if (s != NULL && s->RemoteIP.addr[0] != 127)
+					if (s != NULL && IsLocalHostIP(&s->RemoteIP) == false)
 					{
 						if (StrCmpi(username, ADMINISTRATOR_USERNAME) == 0 || GetHubAdminOption(hub, "deny_empty_password") != 0)
 						{
@@ -3156,7 +3189,7 @@ bool ServerAccept(CONNECTION *c)
 			if (IsURLMsg(msg, NULL, 0) == false)
 			{
 
-				if (s != NULL && s->IsRUDPSession && c != NULL && StrCmpi(hub->Name, VG_HUBNAME) != 0)
+				if (s != NULL && s->IsRUDPSession && c != NULL)
 				{
 					// Show the warning message if the connection is made by NAT-T
 					wchar_t *tmp2;
@@ -3801,7 +3834,7 @@ void CreateNodeInfo(NODE_INFO *info, CONNECTION *c)
 	}
 	else
 	{
-		Copy(info->ClientIpAddress6, c->FirstSock->LocalIP.ipv6_addr, sizeof(info->ClientIpAddress6));
+		Copy(info->ClientIpAddress6, c->FirstSock->LocalIP.address, sizeof(info->ClientIpAddress6));
 	}
 	// Client port number
 	info->ClientPort = Endian32(c->FirstSock->LocalPort);
@@ -3817,7 +3850,7 @@ void CreateNodeInfo(NODE_INFO *info, CONNECTION *c)
 		}
 		else
 		{
-			Copy(info->ServerIpAddress6, ip.ipv6_addr, sizeof(info->ServerIpAddress6));
+			Copy(info->ServerIpAddress6, ip.address, sizeof(info->ServerIpAddress6));
 		}
 	}
 	// Server port number
@@ -3835,7 +3868,7 @@ void CreateNodeInfo(NODE_INFO *info, CONNECTION *c)
 		}
 		else
 		{
-			Copy(&info->ProxyIpAddress6, c->FirstSock->RemoteIP.ipv6_addr, sizeof(info->ProxyIpAddress6));
+			Copy(&info->ProxyIpAddress6, c->FirstSock->RemoteIP.address, sizeof(info->ProxyIpAddress6));
 		}
 
 		info->ProxyPort = Endian32(c->FirstSock->RemotePort);
@@ -5641,25 +5674,18 @@ bool ClientUploadAuth(CONNECTION *c)
 	// UDP acceleration function using flag
 	if (o->NoUdpAcceleration == false && c->Session->UdpAccel != NULL)
 	{
-		IP my_ip;
-
-		Zero(&my_ip, sizeof(my_ip));
-
 		PackAddBool(p, "use_udp_acceleration", true);
 
 		PackAddInt(p, "udp_acceleration_version", c->Session->UdpAccel->Version);
 
-		Copy(&my_ip, &c->Session->UdpAccel->MyIp, sizeof(IP));
-		if (IsLocalHostIP(&my_ip))
+		IP my_ip;
+		if (IsLocalHostIP(&c->Session->UdpAccel->MyIp) == false)
 		{
-			if (IsIP4(&my_ip))
-			{
-				ZeroIP4(&my_ip);
-			}
-			else
-			{
-				ZeroIP6(&my_ip);
-			}
+			Copy(&my_ip, &c->Session->UdpAccel->MyIp, sizeof(my_ip));
+		}
+		else
+		{
+			Zero(&my_ip, sizeof(my_ip));
 		}
 
 		PackAddIp(p, "udp_acceleration_client_ip", &my_ip);
@@ -6025,7 +6051,7 @@ bool ServerDownloadSignature(CONNECTION *c, char **error_detail_str)
 
 					}
 
-					if (c->FirstSock->RemoteIP.addr[0] == 127)
+					if (IsLocalHostIP(&c->FirstSock->RemoteIP))
 					{
 						if (StrCmpi(h->Target, HTTP_SAITAMA) == 0)
 						{

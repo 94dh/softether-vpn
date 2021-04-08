@@ -5,7 +5,42 @@
 // Admin.c
 // RPC Module for Management
 
-#include "CedarPch.h"
+#include "Admin.h"
+
+#include "Account.h"
+#include "AzureClient.h"
+#include "BridgeUnix.h"
+#include "BridgeWin32.h"
+#include "Connection.h"
+#include "DDNS.h"
+#include "Layer3.h"
+#include "Link.h"
+#include "Listener.h"
+#include "Nat.h"
+#include "Remote.h"
+#include "Proto.h"
+#include "Proto_IPsec.h"
+#include "Proto_OpenVPN.h"
+#include "Proto_PPP.h"
+#include "Protocol.h"
+#include "Sam.h"
+#include "SecureNAT.h"
+#include "Server.h"
+#include "Session.h"
+#include "Virtual.h"
+#include "Wpc.h"
+
+#include "Mayaqua/Cfg.h"
+#include "Mayaqua/FileIO.h"
+#include "Mayaqua/Internat.h"
+#include "Mayaqua/HTTP.h"
+#include "Mayaqua/Memory.h"
+#include "Mayaqua/Microsoft.h"
+#include "Mayaqua/Object.h"
+#include "Mayaqua/Pack.h"
+#include "Mayaqua/Str.h"
+#include "Mayaqua/Table.h"
+#include "Mayaqua/Tick64.h"
 
 // Macro for RPC function declaration
 #define	DECLARE_RPC_EX(rpc_name, data_type, function, in_rpc, out_rpc, free_rpc)		\
@@ -5396,7 +5431,7 @@ UINT StGetSessionStatus(ADMIN *a, RPC_SESSION_STATUS *t)
 				t->ClientIp = IPToUINT(&s->Connection->ClientIp);
 				if (IsIP6(&s->Connection->ClientIp))
 				{
-					Copy(&t->ClientIp6, &s->Connection->ClientIp.ipv6_addr, sizeof(t->ClientIp6));
+					Copy(&t->ClientIp6, &s->Connection->ClientIp.address, sizeof(t->ClientIp6));
 				}
 
 				CopyIP(&t->ClientIpAddress, &s->Connection->ClientIp);
@@ -9165,7 +9200,7 @@ UINT StSetHub(ADMIN *a, RPC_CREATE_HUB *t)
 
 		if (Cmp(t->HashedPassword, hash2, SHA1_SIZE) == 0 || Cmp(t->SecurePassword, hash1, SHA1_SIZE) == 0)
 		{
-			if (a->ServerAdmin == false && a->Rpc->Sock->RemoteIP.addr[0] != 127)
+			if (a->ServerAdmin == false && IsLocalHostIP(&a->Rpc->Sock->RemoteIP) == false)
 			{
 				// Refuse to set a blank password to hub admin from remote host
 				ReleaseHub(h);
@@ -15335,7 +15370,7 @@ UINT AdminAccept(CONNECTION *c, PACK *p)
 
 	if (Cmp(secure_null_password, secure_password, SHA1_SIZE) == 0)
 	{
-		if (sock->RemoteIP.addr[0] != 127)
+		if (IsLocalHostIP(&sock->RemoteIP) == false)
 		{
 			// The client tried to use blank password for hub admin mode from remote
 			if (StrLen(hubname) != 0)

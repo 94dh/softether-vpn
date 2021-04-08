@@ -5,7 +5,45 @@
 // Command.c
 // vpncmd Command Line Management Utility
 
-#include "CedarPch.h"
+#include "Command.h"
+
+#include "Admin.h"
+#include "AzureClient.h"
+#include "Connection.h"
+#include "Console.h"
+#include "Database.h"
+#include "DDNS.h"
+#include "Layer3.h"
+#include "Nat.h"
+#include "Proto_IPsec.h"
+#include "Proto_WireGuard.h"
+#include "Radius.h"
+#include "Server.h"
+#include "Virtual.h"
+#include "WinUi.h"
+
+#include "Mayaqua/Cfg.h"
+#include "Mayaqua/FileIO.h"
+#include "Mayaqua/Internat.h"
+#include "Mayaqua/Kernel.h"
+#include "Mayaqua/Memory.h"
+#include "Mayaqua/Microsoft.h"
+#include "Mayaqua/Network.h"
+#include "Mayaqua/Object.h"
+#include "Mayaqua/OS.h"
+#include "Mayaqua/Pack.h"
+#include "Mayaqua/Secure.h"
+#include "Mayaqua/Str.h"
+#include "Mayaqua/Table.h"
+#include "Mayaqua/Tick64.h"
+#include "Mayaqua/Unix.h"
+
+#include <stdlib.h>
+
+#ifdef OS_UNIX
+#include <signal.h>
+#include <sys/wait.h>
+#endif
 
 // System checker definition
 typedef bool (CHECKER_PROC_DEF)();
@@ -916,14 +954,7 @@ void VpnCmdInitBootPath()
 		{
 			bool b = false;
 			// Copy the vpncmdsys.exe to system32
-			if (MsIsNt())
-			{
-				Format(tmp, sizeof(tmp), "%s\\vpncmd.exe", MsGetSystem32Dir());
-			}
-			else
-			{
-				Format(tmp, sizeof(tmp), "%s\\vpncmd.exe", MsGetWindowsDir());
-			}
+			Format(tmp, sizeof(tmp), "%s\\vpncmd.exe", MsGetSystem32Dir());
 
 			if (MsIs64BitWindows() == false || Is64())
 			{
@@ -24700,19 +24731,13 @@ void Win32CmdDebug(bool is_uac)
 
 	UniPrint(_UU("CMD_DEBUG_PRINT"));
 
-	if (MsIsWin2000OrGreater() == false)
-	{
-		MsgBox(NULL, 0x00000040L, _UU("CMD_DEBUG_NOT_2000"));
-		goto LABEL_CLEANUP;
-	}
-
-	if ((MsIsVista() == false || is_uac) && MsIsAdmin() == false)
+	if (is_uac && MsIsAdmin() == false)
 	{
 		MsgBox(NULL, 0x00000040L, _UU("CMD_DEBUG_NOT_ADMIN"));
 		goto LABEL_CLEANUP;
 	}
 
-	if (MsIsVista() && MsIsAdmin() == false)
+	if (MsIsAdmin() == false)
 	{
 		void *process_handle = NULL;
 

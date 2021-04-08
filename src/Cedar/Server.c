@@ -5,7 +5,38 @@
 // Server.c
 // VPN Server module
 
-#include "CedarPch.h"
+#include "Server.h"
+
+#include "Admin.h"
+#include "AzureClient.h"
+#include "BridgeUnix.h"
+#include "BridgeWin32.h"
+#include "Connection.h"
+#include "DDNS.h"
+#include "Layer3.h"
+#include "Link.h"
+#include "Listener.h"
+#include "Nat.h"
+#include "Proto_IPsec.h"
+#include "Protocol.h"
+#include "Radius.h"
+#include "Sam.h"
+#include "SecureNAT.h"
+#include "WinUi.h"
+
+#include "Mayaqua/Cfg.h"
+#include "Mayaqua/FileIO.h"
+#include "Mayaqua/Internat.h"
+#include "Mayaqua/Memory.h"
+#include "Mayaqua/Microsoft.h"
+#include "Mayaqua/Object.h"
+#include "Mayaqua/OS.h"
+#include "Mayaqua/Pack.h"
+#include "Mayaqua/Str.h"
+#include "Mayaqua/Table.h"
+#include "Mayaqua/TcpIp.h"
+#include "Mayaqua/Tick64.h"
+#include "Mayaqua/Win32.h"
 
 static SERVER *server = NULL;
 static LOCK *server_lock = NULL;
@@ -1578,7 +1609,7 @@ void GetServerCapsMain(SERVER *s, CAPSLIST *t)
 	AddCapsBool(t, "b_support_ipv6_ac", true);
 
 	// Support for VLAN tagged packet transmission configuration tool
-	AddCapsBool(t, "b_support_eth_vlan", (OS_IS_WINDOWS_NT(GetOsType()) && GET_KETA(GetOsType(), 100) >= 2));
+	AddCapsBool(t, "b_support_eth_vlan", true);
 
 	// Support for the message display function when the VPN connect to the Virtual HUB
 	AddCapsBool(t, "b_support_msg", true);
@@ -2841,27 +2872,7 @@ bool SiLoadConfigurationCfg(SERVER *s, FOLDER *root)
 		}
 	}
 
-
-	{
-		HUB *h = NULL;
-
-		// Remove the virtual HUB "VPNGATE" when VGS disabled
-		LockHubList(s->Cedar);
-		{
-			h = GetHub(s->Cedar, VG_HUBNAME);
-		}
-		UnlockHubList(s->Cedar);
-
-		if (h != NULL)
-		{
-			StopHub(h);
-			DelHub(s->Cedar, h);
-			ReleaseHub(h);
-		}
-	}
-
 	s->IPsecMessageDisplayed = CfgGetBool(root, "IPsecMessageDisplayed");
-
 
 	return true;
 }

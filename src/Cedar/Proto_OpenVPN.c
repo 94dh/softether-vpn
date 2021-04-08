@@ -5,7 +5,22 @@
 // Proto_OpenVPN.c
 // OpenVPN protocol stack
 
-#include "CedarPch.h"
+#include "Proto_OpenVPN.h"
+
+#include "Cedar.h"
+#include "Connection.h"
+#include "IPC.h"
+#include "Logging.h"
+#include "Proto_EtherIP.h"
+#include "Proto_PPP.h"
+#include "Server.h"
+
+#include "Mayaqua/Internat.h"
+#include "Mayaqua/Memory.h"
+#include "Mayaqua/Object.h"
+#include "Mayaqua/Str.h"
+#include "Mayaqua/Table.h"
+#include "Mayaqua/Tick64.h"
 
 // Ping signature of the OpenVPN protocol
 static UCHAR ping_signature[] =
@@ -2901,7 +2916,7 @@ int OvsCompareSessionList(void *p1, void *p2)
 		return 0;
 	}
 
-	i = CmpIpAddr(&s1->Protocol, &s2->Protocol);
+	i = Cmp(&s1->Protocol, &s2->Protocol, sizeof(s1->Protocol));
 	if (i != 0)
 	{
 		return i;
