@@ -845,7 +845,7 @@ BUF *BuildICMPv6(IPV6_ADDR *src_ip, IPV6_ADDR *dest_ip, UCHAR hop_limit, UCHAR t
 }
 
 // Build an ICMPv6 Neighbor Solicitation packet
-BUF *BuildICMPv6NeighborSoliciation(IPV6_ADDR *src_ip, IPV6_ADDR *target_ip, UCHAR *my_mac_address, UINT id)
+BUF *BuildICMPv6NeighborSoliciation(IPV6_ADDR *src_ip, IPV6_ADDR *target_ip, UCHAR *my_mac_address, UINT id, bool use_multicast)
 {
 	ICMPV6_OPTION_LIST opt;
 	ICMPV6_OPTION_LINK_LAYER link;
@@ -875,8 +875,24 @@ BUF *BuildICMPv6NeighborSoliciation(IPV6_ADDR *src_ip, IPV6_ADDR *target_ip, UCH
 	WriteBuf(b2, &header, sizeof(header));
 	WriteBufBuf(b2, b);
 
-	ret = BuildICMPv6(src_ip, target_ip, 255,
-	                  ICMPV6_TYPE_NEIGHBOR_SOLICIATION, 0, b2->Buf, b2->Size, id);
+	if (use_multicast)
+	{
+		IPV6_ADDR solicitAddress;
+		Zero(&solicitAddress, sizeof(IPV6_ADDR));
+		solicitAddress.Value[0] = 0xFF;
+		solicitAddress.Value[1] = 0x02;
+		solicitAddress.Value[11] = 0x01;
+		solicitAddress.Value[12] = 0xFF;
+		Copy(&solicitAddress.Value[13], &target_ip->Value[13], 3);
+
+		ret = BuildICMPv6(src_ip, &solicitAddress, 255,
+	                          ICMPV6_TYPE_NEIGHBOR_SOLICIATION, 0, b2->Buf, b2->Size, id);
+	}
+	else
+	{
+		ret = BuildICMPv6(src_ip, target_ip, 255,
+	                          ICMPV6_TYPE_NEIGHBOR_SOLICIATION, 0, b2->Buf, b2->Size, id);
+	}
 
 	FreeBuf(b);
 	FreeBuf(b2);
@@ -1808,7 +1824,7 @@ void CorrectChecksum(PKT *p)
 						USHORT udp_offloading_checksum1 = CalcChecksumForIPv6(&v6->SrcAddress, &v6->DestAddress, IP_PROTO_UDP, NULL, 0, udp_len);
 						USHORT udp_offloading_checksum2 = ~udp_offloading_checksum1;
 
-						if (udp->Checksum == 0 || udp->Checksum == udp_offloading_checksum1 || udp->Checksum == udp_offloading_checksum2)
+						if (udp->Checksum == udp_offloading_checksum1 || udp->Checksum == udp_offloading_checksum2)
 						{
 							udp->Checksum = 0;
 
@@ -4233,15 +4249,16 @@ BUF *DhcpModify(DHCP_MODIFY_OPTION *m, void *data, UINT size)
 			}
 		}
 
-		if (ok && o2 == NULL)
+		if (ok)
 		{
 			o2 = NewDhcpOption(o->Id, o->Data, o->Size);
+			if (o2 != NULL)
+			{
+				Add(opt_list2, o2);
+			}
+
 		}
 
-		if (o2 != NULL)
-		{
-			Add(opt_list2, o2);
-		}
 	}
 
 	opt_buf = BuildDhcpOptionsBuf(opt_list2);
