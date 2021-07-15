@@ -806,9 +806,6 @@ static UINT SmDdnsGetKey(char *key, SM_DDNS *d){
 
 void SmDDnsDlgInit(HWND hWnd, SM_DDNS *d)
 {
-	char key[20];
-	char encodedkey[20 * 4 + 32];
-
 	// Validate arguments
 	if (hWnd == NULL || d == NULL)
 	{
@@ -845,10 +842,15 @@ void SmDDnsDlgInit(HWND hWnd, SM_DDNS *d)
 
 	Hide(hWnd, B_PROXY);
 
-	if(SmDdnsGetKey(key, d) == ERR_NO_ERROR){
-		encodedkey[ B64_Encode(encodedkey, key, 20) ] = 0;
-		SetTextA(hWnd, E_KEY, encodedkey);
-	}else{
+	char key[20];
+	if (SmDdnsGetKey(key, d) == ERR_NO_ERROR)
+	{
+		char *encoded_key = Base64FromBin(NULL, key, sizeof(key));
+		SetTextA(hWnd, E_KEY, encoded_key);
+		Free(encoded_key);
+	}
+	else
+	{
 		SetText(hWnd, E_KEY, _UU("SM_DDNS_KEY_ERR"));
 	}
 
@@ -9329,12 +9331,6 @@ void SmSessionDlgUpdate(HWND hWnd, SM_HUB *s)
 				}
 			}
 		}
-	}
-
-	if (s->p->ServerInfo.ServerBuildInt < 2844)
-	{
-		// Old version doesn't support for remote management of the sessions
-		ok2 = ok;
 	}
 
 	SetEnable(hWnd, IDOK, ok2);

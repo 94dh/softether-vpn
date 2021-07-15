@@ -412,6 +412,7 @@ struct TUBE
 	bool IsInFlushList;					// Whether it is registered in the Tube Flush List
 	void *Param1, *Param2, *Param3;
 	UINT IntParam1, IntParam2, IntParam3;
+	UINT64 DataTimeout;
 };
 
 // Data that is to send and to receive in the tube
@@ -1069,6 +1070,7 @@ SOCK *ListenEx(UINT port, bool local_only);
 SOCK *ListenEx2(UINT port, bool local_only, bool enable_ca, IP *listen_ip);
 SOCK *ListenEx6(UINT port, bool local_only);
 SOCK *ListenEx62(UINT port, bool local_only, bool enable_ca);
+SOCK *ListenEx63(UINT port, bool local_only, bool enable_ca, IP *listen_ip);
 SOCK *Accept(SOCK *sock);
 SOCK *Accept6(SOCK *sock);
 UINT Send(SOCK *sock, void *data, UINT size, bool secure);

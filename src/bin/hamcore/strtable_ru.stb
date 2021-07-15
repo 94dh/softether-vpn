@@ -170,7 +170,7 @@ ERR_103					Not enough Client Connection Licenses on the destination VPN Server.
 ERR_104					Not enough Bridge Connection Licenses on the destination VPN Server. Contact the server administrator.
 ERR_105					Due to current technical difficulties, the destination VPN Server is not receiving the connection. Either wait a while, or contact the VPN Server administrator requesting that the server log file be checked.
 ERR_106					The destination VPN Server's certificate has expired. Contact the VPN Server's administrator.
-ERR_107					A connection has beens requested in Monitoring Mode. But the security policy for the connecting user does not permit Monitoring Mode.
+ERR_107					A connection has been requested in Monitoring Mode. But the security policy for the connecting user does not permit Monitoring Mode.
 ERR_108					A connection has been requested in Bridge / Router Mode. But the security policy for the connecting user forbids both bridge mode and router mode.
 ERR_109					A connection from a client IP address has been denied by the Source IP Restriction List of the Virtual Hub.
 ERR_110					There are too many items.
@@ -398,7 +398,7 @@ PW_TYPE_1				Standard Password Authentication
 PW_TYPE_2				RADIUS or NT Domain Authentication
 PW_TYPE_3				Client Certificate Authentication
 PW_TYPE_4				Smart Card Authentication
-PW_TYPE_5				Openssl Engine Authentication
+PW_TYPE_5				OpenSSL Engine Authentication
 
 PW_MSG_PROXY			User authentication failed on the proxy server %S. Re-enter the correct user name and password.
 PW_TYPE_PROXY			Proxy Server Authentication
@@ -452,8 +452,6 @@ WINVER_ERROR_PC_REMOTE	удаленный сервер
 # Warning for Open-source Version
 OSS_MSG					Welcome to the SoftEther VPN Server Academic Version!\r\n\r\n\r\nThis VPN Server is open-source free software developed as academic research at University of Tsukuba, Japan, and distributed from the SoftEther VPN Project (http://www.softether.org/), for free of charge for the public interests.\r\n\r\nSoftEther VPN software is distributed to public as a part of the joint-research contract between University of Tsukuba and SoftEther VPN Project. SoftEther VPN software is developed and published for JUST AN ACADEMIC RESEARCH PURPOSE. Therefore no support service are provided about SoftEther VPN software even if it contains bugs or vulnerabilities. A user will be liable for the result of use SoftEther VPN. The developers and publishers of SoftEther VPN will never be liable for either any consequences or damages.\r\n\r\nEnjoy using VPN with SoftEther VPN Server.\r\n\r\nFor more details of SoftEther VPN, visit http://www.softether.org/.\r\n\r\n
 NATT_MSG				** Connected with NAT traversal - might be unstable **\r\n\r\nThis VPN Client is connected to the VPN Server '%S' by using the NAT Traversal (UDP Hole Punching) technology.\r\n\r\nNAT Traversal allows the VPN Server behind the NAT-box to accept VPN connections from VPN Client without any port-forwarding setting on the NAT-box.\r\n\r\nHowever, NAT Traversal-based VPN sessions sometimes become unstable, because NAT Traversal uses UDP-based protocol. For example, the VPN tunnel disconnects every 5 minutes if there is a poor NAT-box between the VPN Server and the VPN Client. Some large-scale NAT gateways in cheap ISPs sometimes cause the same problem on NAT Traversal. This is a problem of routers or ISPs. This is not a problem of SoftEther VPN software.\r\n\r\nTo solve the unstable tunnel problem, you should connect to the VPN Server's TCP listener port directly, instead of using NAT Traversal. To connect to the VPN Server directly by using TCP, a listener port of the VPN Server must be exposed to the Internet by a port-forward setting on the NAT-box. Ask the administrator of the NAT-box, or refer to the manual of the NAT-box to add a port-forwarding setting on the NAT-box.\r\n\r\nIf this message still remains despite the VPN Server is exposing a TCP port to the Internet, check the "Disable NAT-T" checkbox on the VPN Client connection setting screen.\r\n\r\n
-NATT_MSG2				** Connected with NAT traversal - might be unstable **\r\n\r\nThis VPN Client is connected to the VPN Server '%S' by using the NAT Traversal (UDP Hole Punching) technology.\r\n\r\nNAT Traversal allows the VPN Server behind the NAT-box to accept VPN connections from VPN Client without any port-forwarding setting on the NAT-box.\r\n\r\nHowever, NAT Traversal-based VPN sessions sometimes become unstable, because NAT Traversal uses UDP-based protocol. For example, the VPN tunnel disconnects every 5 minutes if there is a poor NAT-box between the VPN Server and the VPN Client. Some large-scale NAT gateways in cheap ISPs sometimes cause the same problem on NAT Traversal. This is a problem of routers or ISPs. This is not a problem of SoftEther VPN software.\r\n\r\nTo solve the unstable tunnel problem, you should connect to the VPN Server's TCP listener port directly, instead of using NAT Traversal. To connect to the VPN Server directly by using TCP, a listener port of the VPN Server must be exposed to the Internet by a port-forward setting on the NAT-box. Ask the administrator of the NAT-box, or refer to the manual of the NAT-box to add a port-forwarding setting on the NAT-box.\r\n\r\nIf this message still remains despite the VPN Server is exposing a TCP port to the Internet, check the "Disable NAT-T" checkbox on the VPN Client connection setting screen after upgrading the VPN Client to Build 9428 or later.\r\n\r\n
-
 
 
 # Virtual HUB Admin Options
@@ -1923,7 +1921,7 @@ LH_AUTH_OK_CERT			The Virtual Hub's Security Account Manager has received the fo
 LH_AUTH_NG_CERT			Although the Virtual Hub's Security Account Manager has received the following certificate, has refused its contents as the certificate for when user "%S" logs in because this certificate's contents matches the contents that are registered in the Virtual Hub's certificates revocation list: %s
 LH_AUTH_NG				Connection "%S": User authentication failed. The user name that has been provided was "%S", from %S.
 LH_LOCAL_ONLY			Connection "%S": The remote login has been refused because of the password for user "%S" is blank.
-LH_POLICY_ACCESS_NG		Connection "%S": Access has beens refused to user "%S" based on the security policy.
+LH_POLICY_ACCESS_NG		Connection "%S": Access has been refused to user "%S" based on the security policy.
 LH_USER_EXPIRES			Connection "%S": Access has been refused to user "%S" because of the expiration date has been expired.
 LH_CLIENT_VERSION_OLD	Connection "%S": The build number of the VPN Client is %u. Only the build %u or latest version of VPN Client is granted to access the VPN Server.
 LH_CLIENT_ID_REQUIRED	Connection "%S": The Client ID which has been specified by the VPN Client is %u. However, this Virtual Hub has the RequiredClientId value set to %u.
@@ -2004,8 +2002,8 @@ LA_CREATE_LISTENER		A new TCP listener (port number %u) has been created.
 LA_DELETE_LISTENER		TCP listener (port number %u) has been deleted.
 LA_ENABLE_LISTENER		TCP listener (port number %u) has been enabled.
 LA_DISABLE_LISTENER		TCP listener (port number %u) has been disabled.
-LA_SET_PORTS_UDP		UDP ports have been set: %s.
-LA_SET_PROTO_OPTIONS	%s options have been set.
+LA_SET_PORTS_UDP		UDP ports have been set: %S.
+LA_SET_PROTO_OPTIONS	%S options have been set.
 LA_SET_SERVER_PASSWORD	The server administrator password has been set.
 LA_SET_FARM_SETTING		The clustering setting has been changed.
 LA_SET_SERVER_CERT		The server certificates have been set.
@@ -6978,6 +6976,23 @@ CMD_RemoteDisable_Args	RemoteDisable
 ###################################################
 
 
+# GenX25519 command
+CMD_GenX25519				Create new X25519 keypair
+CMD_GenX25519_Help			Use this to create a new X25519 keypair, which can be used for WireGuard. \nBoth the private and public key will be shown. \nThe public key can be shared and is used to identify a peer. \nAlso, it can always be retrieved from the private key using the GetPublicX25519 command. \nThe private key should be kept in a secure place and never be shared. \nIt cannot be recovered once lost.
+CMD_GenX25519_ARGS			GenX25519
+CMD_GenX25519_PRIVATE_KEY	Private key: 
+CMD_GenX25519_PUBLIC_KEY	Public key: 
+
+
+# GetPublicX25519 command
+CMD_GetPublicX25519				Retrieve public X25519 key from a private one
+CMD_GetPublicX25519_Help		Use this if you have a private X25519 key and want to get its corresponding public key.
+CMD_GetPublicX25519_ARGS    	GetPublicX25519 [private]
+CMD_GetPublicX25519_[private]	The private X25519 key you want to get the corresponding public key of.
+CMD_GetPublicX25519_PRIVATE_KEY	Private key: 
+CMD_GetPublicX25519_PUBLIC_KEY	Public key: 
+
+
 # MakeCert command
 CMD_MakeCert			Create New X.509 Certificate and Private Key (1024 bit)
 CMD_MakeCert_Help		Use this to create a new X.509 certificate and private key and save it as a file. \nThe algorithm used to create the public key and private key of the certificate is RSA 1024 bit. \nYou can choose to create a root certificate (self-signed certificate) or a certificate signed by another certificate. To create a certificate that is signed by another certificate, you require a private key file (base 64 encoded) that is compatible with the certificate that uses the signature (X.509 format file). \n\nWhen creating a certificate, you can specify the following: Name (CN), Organization (O), Organization Unit (OU), Country (C), State (ST), Locale (L), Serial Number, and Expiration Date. \nThe created certificate will be saved as an X.509 format file and the private key file will be saved in a Base 64 encoded RSA 1024 bit format file. \n\nThe MakeCert command is a tool that provides the most rudimentary function for creating certificates. If you want to create a more substantial certificate, we recommend that you use either free software such as OpenSSL, or commercial CA (certificate authority) software. \n\nNote: This command can be called from the SoftEther VPN Command Line Management Utility. You can also execute this command while connected to the current VPN Server or VPN Client in Administration Mode but, what actually performs the RSA computation, generates the certificate data and saves it to file is the computer on which the command is running, and all this is executed in a context that has absolutely no relationship to the computer that is the destination of the Administration Mode connection.
@@ -7066,7 +7081,7 @@ TTS_ACCEPTED			Connection %u: Connected from Client %S Port %u.
 TTS_DISCONNECTED		Connection %u (%S) has been disconnected.
 TTS_DISCONNECT			Connection %u (%S) has been disconnected.
 TTC_INIT				Starting the client program...
-TTC_FREE				The client program has beens terminated.
+TTC_FREE				The client program has been terminated.
 TTC_CONNECT_START		The connection to server %S (port %u) will start. %u TCP connections will be connected.
 TTC_CONNECT_FAILED		The connection of TCP connection number %u failed.
 TTC_CONNECT_NOT_SERVER	Because a program other than TrafficServer is operating on the destination TCP port, traffic cannot be measured.

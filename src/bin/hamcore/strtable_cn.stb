@@ -400,7 +400,7 @@ PW_TYPE_1					标准密码验证
 PW_TYPE_2					RADIUS 或 NT 域验证
 PW_TYPE_3					客户端证书认证
 PW_TYPE_4					智能卡身份验证
-PW_TYPE_5				Openssl Engine Authentication
+PW_TYPE_5				OpenSSL Engine 验证
 
 PW_MSG_PROXY				代理服务器 %S 用户身份验证失败。请重新输入正确的用户名和密码。
 PW_TYPE_PROXY				代理服务器认证
@@ -457,9 +457,6 @@ OSS_MSG						欢迎来到 SoftEther VPN 服务器学术版 !\r\n\r\n此 VPN 服�
 
 # NAT Traversal warning
 NATT_MSG					** 使用 NAT 穿透 (UDP 打洞) - 它可能是不稳定的 **\r\n\r\n此 VPN 客户端通过使用 NAT 穿透 (UDP 打洞) 技术连接到 VPN 服务器 '%S'。\r\n\r\nNAT 穿透允许位于 NAT 盒后面的 VPN 服务器接受来自 NAT 盒中的、没有任何端口映射设置的 VPN 客户端的 VPN 连接。\r\n\r\n然而，基于 NAT 穿透的 VPN 会话有时会变得不稳定，因为 NAT 穿透使用的是基于 UDP 的协议。例如，如果在 VPN 服务器和 VPN 客户端之间有一个不好的 NAT 盒子， VPN 隧道每 5 分钟断开一次。一些大规模 NAT 网关使用便宜的互联网服务供应商，有时会造成 NAT 穿透的同样问题。这是路由器或互联网服务供应商的问题。这不是 SoftEther VPN 软件的问题。\r\n\r\n为了解决这个不稳定的隧道问题，您应该直接连接到 VPN 服务器的 TCP 监听端口，而不是使用 NAT 穿透功能。要使用 TCP 直接连接到 VPN 服务器， VPN 服务器的监听端口必须通过在 NAT 盒的端口映射设置暴露到互联网上。请询问 NAT 盒的管理员或参阅 NAT 盒的手册在 NAT 盒上添加端口映射设置。\r\n\r\n如果此消息仍是 VPN 服务器暴露了一个 TCP 端口到互联网后，检查 VPN 客户端连接设置屏幕上的 "禁用 NAT-T" 复选框。\r\n\r\n
-NATT_MSG2					** 使用 NAT 穿透 (UDP 打洞) - 它可能是不稳定的 **\r\n\r\n此 VPN 客户端通过使用 NAT 穿透 (UDP 打洞) 技术连接到 VPN 服务器 '%S'。\r\n\r\nNAT 穿透允许位于 NAT 盒后面的 VPN 服务器接受来自 NAT 盒中的、没有任何端口映射设置的 VPN 客户端的 VPN 连接。\r\n\r\n然而，基于 NAT 穿透的 VPN 会话有时会变得不稳定，因为 NAT 穿透使用的是基于 UDP 的协议。例如，如果在 VPN 服务器和 VPN 客户端之间有一个不好的 NAT 盒子， VPN 隧道每 5 分钟断开一次。一些大规模 NAT 网关使用便宜的互联网服务供应商，有时会造成 NAT 穿透的同样问题。这是路由器或互联网服务供应商的问题。这不是 SoftEther VPN 软件的问题。\r\n\r\n为了解决这个不稳定的隧道问题，您应该直接连接到 VPN 服务器的 TCP 监听端口，而不是使用 NAT 穿透功能。要使用 TCP 直接连接到 VPN 服务器， VPN 服务器的监听端口必须通过在 NAT 盒的端口映射设置暴露到互联网上。请询问 NAT 盒的管理员或参阅 NAT 盒的手册在 NAT 盒上添加端口映射设置。\r\n\r\n如果此消息仍是 VPN 服务器暴露了一个 TCP 端口到互联网后，检查 VPN 客户端连接设置屏幕上的 "禁用 NAT-T" 复选框、而你的 VPN 客户端升级到 Build 9428 或更高版本。\r\n\r\n
-
-
 
 
 #虚拟 HUB 管理选项
@@ -2021,8 +2018,8 @@ LA_CREATE_LISTENER			已建立新 TCP 监听器 (端口号 %u)。
 LA_DELETE_LISTENER			已删除 TCP 监听器 (端口号 %u)。
 LA_ENABLE_LISTENER			已启用 TCP 监听器 (端口号 %u)。
 LA_DISABLE_LISTENER			已禁用 TCP 监听器 (端口号 %u)。
-LA_SET_PORTS_UDP			UDP ports have been set: %s.
-LA_SET_PROTO_OPTIONS		%s options have been set.
+LA_SET_PORTS_UDP			UDP ports have been set: %S.
+LA_SET_PROTO_OPTIONS		%S options have been set.
 LA_SET_SERVER_PASSWORD		服务端管理员密码设置完成。
 LA_SET_FARM_SETTING			群集设置变更完成。
 LA_SET_SERVER_CERT			服务端证书设定完成。
@@ -7004,6 +7001,23 @@ CMD_RemoteDisable_Args		RemoteDisable
 # 下面这是VPN工具用的指令             #
 #                                                 #
 ###################################################
+
+
+# GenX25519 命令
+CMD_GenX25519				Create new X25519 keypair
+CMD_GenX25519_Help			Use this to create a new X25519 keypair, which can be used for WireGuard. \nBoth the private and public key will be shown. \nThe public key can be shared and is used to identify a peer. \nAlso, it can always be retrieved from the private key using the GetPublicX25519 command. \nThe private key should be kept in a secure place and never be shared. \nIt cannot be recovered once lost.
+CMD_GenX25519_ARGS			GenX25519
+CMD_GenX25519_PRIVATE_KEY	Private key: 
+CMD_GenX25519_PUBLIC_KEY	Public key: 
+
+
+# GetPublicX25519 命令
+CMD_GetPublicX25519				Retrieve public X25519 key from a private one
+CMD_GetPublicX25519_Help		Use this if you have a private X25519 key and want to get its corresponding public key.
+CMD_GetPublicX25519_ARGS    	GetPublicX25519 [private]
+CMD_GetPublicX25519_[private]	The private X25519 key you want to get the corresponding public key of.
+CMD_GetPublicX25519_PRIVATE_KEY	Private key: 
+CMD_GetPublicX25519_PUBLIC_KEY	Public key: 
 
 
 # MakeCert 命令

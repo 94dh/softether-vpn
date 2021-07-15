@@ -260,26 +260,6 @@ CAPSLIST *ScGetCapsEx(RPC *rpc)
 		AddCapsBool(t, "b_support_config_log", info.ServerType != SERVER_TYPE_FARM_MEMBER);
 		AddCapsBool(t, "b_support_autodelete", false);
 	}
-	else
-	{
-		// Success getting Caps
-		if (info.ServerBuildInt <= 4350)
-		{
-			if (is_bridge == false)
-			{
-				// b_support_cluster should be true for build 4300 or earlier
-				CAPS *caps = GetCaps(t, "b_support_cluster");
-				if (caps == NULL)
-				{
-					AddCapsBool(t, "b_support_cluster", true);
-				}
-				else
-				{
-					caps->Value = 1;
-				}
-			}
-		}
-	}
 
 	if (true)
 	{
@@ -959,30 +939,26 @@ bool HttpParseBasicAuthHeader(HTTP_HEADER *h, char *username, UINT username_size
 		{
 			if (StrCmpi(key, "Basic") == 0 && IsEmptyStr(value) == false)
 			{
-				UINT b64_dest_size = StrSize(value) * 2 + 256;
-				char *b64_dest = ZeroMalloc(b64_dest_size);
-
-				Decode64(b64_dest, value);
-
-				if (IsEmptyStr(b64_dest) == false)
+				char *str = Base64ToBin(NULL, value, StrLen(value));
+				if (str != NULL)
 				{
-					if (b64_dest[0] == ':')
+					if (str[0] == ':')
 					{
 						// Empty username
 						StrCpy(username, username_size, "");
-						StrCpy(password, password_size, b64_dest + 1);
+						StrCpy(password, password_size, str + 1);
 						ret = true;
 					}
 					else
 					{
-						if (GetKeyAndValue(b64_dest, username, username_size, password, password_size, ":"))
+						if (GetKeyAndValue(str, username, username_size, password, password_size, ":"))
 						{
 							ret = true;
 						}
 					}
-				}
 
-				Free(b64_dest);
+					Free(str);
+				}
 			}
 		}
 	}
@@ -6550,8 +6526,6 @@ UINT StSetAccessList(ADMIN *a, RPC_ENUM_ACCESS_LIST *t)
 	UINT i;
 	bool no_jitter = false;
 	bool no_include = false;
-	UINT ret = ERR_NO_ERROR;
-
 
 	NO_SUPPORT_FOR_BRIDGE;
 	if (s->ServerType == SERVER_TYPE_FARM_MEMBER)
@@ -6595,59 +6569,19 @@ UINT StSetAccessList(ADMIN *a, RPC_ENUM_ACCESS_LIST *t)
 
 	LockList(h->AccessList);
 	{
-		UINT i;
-
-		if (a->ClientBuild != 0)
+		// Delete whole access list
+		for (i = 0; i < LIST_NUM(h->AccessList); ++i)
 		{
-			// Confirm whether the access list of form which cannot handle by the old client already exists
-			if (a->ClientBuild < 6560)
-			{
-				for (i = 0;i < LIST_NUM(h->AccessList);i++)
-				{
-					ACCESS *access = LIST_DATA(h->AccessList, i);
-					if (access->IsIPv6 ||
-						access->Jitter != 0 || access->Loss != 0 || access->Delay != 0)
-					{
-						ret = ERR_VERSION_INVALID;
-						break;
-					}
-				}
-			}
-
-			if (a->ClientBuild < 8234)
-			{
-				for (i = 0;i < LIST_NUM(h->AccessList);i++)
-				{
-					ACCESS *access = LIST_DATA(h->AccessList, i);
-
-					if (IsEmptyStr(access->RedirectUrl) == false)
-					{
-						ret = ERR_VERSION_INVALID;
-						break;
-					}
-				}
-			}
+			ACCESS *access = LIST_DATA(h->AccessList, i);
+			Free(access);
 		}
 
-		if (ret == ERR_NO_ERROR)
-		{
-			// Delete whole access list
-			for (i = 0;i < LIST_NUM(h->AccessList);i++)
-			{
-				ACCESS *access = LIST_DATA(h->AccessList, i);
-				Free(access);
-			}
+		DeleteAll(h->AccessList);
 
-			DeleteAll(h->AccessList);
-		}
-	}
-
-	if (ret == ERR_NO_ERROR)
-	{
 		ALog(a, h, "LA_SET_ACCESS_LIST", t->NumAccess);
 
 		// Add whole access list
-		for (i = 0;i < t->NumAccess;i++)
+		for (i = 0; i < t->NumAccess; ++i)
 		{
 			ACCESS *a = &t->Accesses[i];
 
@@ -6686,14 +6620,10 @@ UINT StSetAccessList(ADMIN *a, RPC_ENUM_ACCESS_LIST *t)
 		h->CurrentVersion++;
 		SiHubUpdateProc(h);
 	}
-	else
-	{
-		UnlockList(h->AccessList);
-	}
 
 	ReleaseHub(h);
 
-	return ret;
+	return ERR_NO_ERROR;
 }
 
 // Add access list entry
@@ -10143,8 +10073,7 @@ UINT StSetPortsUDP(ADMIN *a, RPC_PORTS *t)
 
 	LockList(server_ports);
 	{
-		char tmp[MAX_SIZE];
-		wchar_t str[MAX_SIZE];
+		char str[MAX_SIZE];
 
 		for (i = 0; i < LIST_NUM(server_ports); ++i)
 		{
@@ -10160,8 +10089,7 @@ UINT StSetPortsUDP(ADMIN *a, RPC_PORTS *t)
 
 		ProtoSetUdpPorts(a->Server->Proto, server_ports);
 
-		IntListToStr(tmp, sizeof(tmp), server_ports, ", ");
-		StrToUni(str, sizeof(str), tmp);
+		IntListToStr(str, sizeof(str), server_ports, ", ");
 		ALog(a, NULL, "LA_SET_PORTS_UDP", str);
 	}
 	UnlockList(server_ports);

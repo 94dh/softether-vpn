@@ -2385,23 +2385,6 @@ bool ServerAccept(CONNECTION *c)
 				goto CLEANUP;
 			}
 
-			if ((policy->NoSavePassword) || (policy->AutoDisconnect != 0))
-			{
-				if (c->ClientBuild < 6560 && InStrEx(c->ClientStr, "client", false))
-				{
-					// If NoSavePassword policy is specified,
-					// only supported client can connect
-					HLog(hub, "LH_CLIENT_VERSION_OLD", c->Name, c->ClientBuild, 6560);
-
-					Unlock(hub->lock);
-					ReleaseHub(hub);
-					c->Err = ERR_VERSION_INVALID;
-					error_detail = "ERR_VERSION_INVALID";
-					Free(policy);
-					goto CLEANUP;
-				}
-			}
-
 			if (user_expires != 0 && user_expires <= SystemTime64())
 			{
 				// User expired
@@ -3217,7 +3200,7 @@ bool ServerAccept(CONNECTION *c)
 #endif	// OS_WIN32
 
 					tmp2 = ZeroMalloc(tmp2_size);
-					UniFormat(tmp2, tmp2_size, _UU(c->ClientBuild >= 9428 ? "NATT_MSG" : "NATT_MSG2"), local_name);
+					UniFormat(tmp2, tmp2_size, _UU("NATT_MSG"), local_name);
 
 					UniStrCat(tmp, tmpsize, tmp2);
 
@@ -3843,7 +3826,18 @@ void CreateNodeInfo(NODE_INFO *info, CONNECTION *c)
 	// Server host name
 	StrCpy(info->ServerHostname, sizeof(info->ServerHostname), c->ServerName);
 	// Server IP address
-	if (GetIP(&ip, info->ServerHostname))
+	if (s->ClientOption->ProxyType == PROXY_DIRECT)
+	{
+		if (IsIP6(&c->FirstSock->RemoteIP) == false)
+		{
+			info->ServerIpAddress = IPToUINT(&c->FirstSock->RemoteIP);
+		}
+		else
+		{
+			Copy(info->ServerIpAddress6, c->FirstSock->RemoteIP.address, sizeof(info->ServerIpAddress6));
+		}
+	}
+	else if (GetIP(&ip, info->ServerHostname))
 	{
 		if (IsIP6(&ip) == false)
 		{

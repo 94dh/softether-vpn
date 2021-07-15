@@ -400,7 +400,7 @@ PW_TYPE_1				標準パスワード認証
 PW_TYPE_2				RADIUS または NT ドメイン認証
 PW_TYPE_3				クライアント証明書認証
 PW_TYPE_4				スマートカード認証
-PW_TYPE_5				Openssl Engine Authentication
+PW_TYPE_5				OpenSSL Engine 認証
 
 PW_MSG_PROXY			プロキシサーバー %S でのユーザー認証に失敗しました。正しいユーザー名とパスワードを再入力してください。
 PW_TYPE_PROXY			プロキシサーバー認証
@@ -476,7 +476,6 @@ OSS_MSG					はじめに - SoftEther VPN Server について\r\n\r\nこの VPN S
 
 # NAT Traversal に関する警告
 NATT_MSG				** NAT Traversal 接続 - 安定性低下の可能性があります **\r\n\r\nVPN Client は VPN Server '%S' に NAT トラバーサル (UDP ホールパンチング) モードで接続しました。\r\n\r\nNAT トラバーサルによって、VPN Client は NAT やファイアウォールの背後にある VPN Server に、それらの NAT やファイアウォールでのポートフォワーディングの設定を行うことなく接続することができます。\r\n\r\nしかし、NAT トラバーサルは UDP をベースとした通信を使用するため、VPN セッションが不安定になる原因となる場合があります。たとえば、安価な NAT ルータが VPN Server と VPN Client との間に存在する場合、NAT トラバーサル上の VPN トンネルは 5 分ごとに切断される場合があります。また、安価な ISP が大規模な NAT を使用している場合にも NAT トラバーサルは不安定になります。これはルータや ISP の品質の問題であり、SoftEther VPN の問題ではありません。\r\n\r\nこれを解決するためには、NAT トラバーサルを使用するのではなく、直接 TCP/IP によって VPN Server のリスナーポートに VPN Client が接続することができるようにします。そのためには、VPN Server のリスナーポートがインターネットに対して公開されるように、NAT におけるポートフォワーディング設定を行ってください。NAT におけるポートフォワーディング設定の方法は、NAT の管理者に問い合わせるか、NAT 製品の説明書をお読みください。\r\n\r\nVPN Server が TCP ポートをインターネットに対して公開しているにも関わらずこのメッセージが表示される場合は、VPN Client の接続設定画面で「NAT-T 無効」をチェックしてください。\r\n\r\n
-NATT_MSG2				** NAT Traversal 接続 - 安定性低下の可能性があります **\r\n\r\nVPN Client は VPN Server '%S' に NAT トラバーサル (UDP ホールパンチング) モードで接続しました。\r\n\r\nNAT トラバーサルによって、VPN Client は NAT やファイアウォールの背後にある VPN Server に、それらの NAT やファイアウォールでのポートフォワーディングの設定を行うことなく接続することができます。\r\n\r\nしかし、NAT トラバーサルは UDP をベースとした通信を使用するため、VPN セッションが不安定になる原因となる場合があります。たとえば、安価な NAT ルータが VPN Server と VPN Client との間に存在する場合、NAT トラバーサル上の VPN トンネルは 5 分ごとに切断される場合があります。また、安価な ISP が大規模な NAT を使用している場合にも NAT トラバーサルは不安定になります。これはルータや ISP の品質の問題であり、SoftEther VPN の問題ではありません。\r\n\r\nこれを解決するためには、NAT トラバーサルを使用するのではなく、直接 TCP/IP によって VPN Server のリスナーポートに VPN Client が接続することができるようにします。そのためには、VPN Server のリスナーポートがインターネットに対して公開されるように、NAT におけるポートフォワーディング設定を行ってください。NAT におけるポートフォワーディング設定の方法は、NAT の管理者に問い合わせるか、NAT 製品の説明書をお読みください。\r\n\r\nVPN Server が TCP ポートをインターネットに対して公開しているにも関わらずこのメッセージが表示される場合は、VPN Client のバージョンを Build 9428 以降にアップグレードしてから、VPN Client の接続設定画面で「NAT-T 無効」をチェックしてください。\r\n\r\n
 
 
 # 仮想 HUB 管理オプション関係
@@ -2008,8 +2007,8 @@ LA_CREATE_LISTENER		新しい TCP リスナー (ポート番号 %u) を作成し
 LA_DELETE_LISTENER		TCP リスナー (ポート番号 %u) を削除しました。
 LA_ENABLE_LISTENER		TCP リスナー (ポート番号 %u) を有効化しました。
 LA_DISABLE_LISTENER		TCP リスナー (ポート番号 %u) を無効化しました。
-LA_SET_PORTS_UDP		UDP ポートの一覧が設定されました: %s.
-LA_SET_PROTO_OPTIONS	オプション %s が設定されました。
+LA_SET_PORTS_UDP		UDP ポートの一覧が設定されました: %S.
+LA_SET_PROTO_OPTIONS	オプション %S が設定されました。
 LA_SET_SERVER_PASSWORD	サーバー管理者パスワードを設定しました。
 LA_SET_FARM_SETTING		クラスタリング設定を変更しました。
 LA_SET_SERVER_CERT		サーバー証明書を設定しました。
@@ -5138,7 +5137,7 @@ CMD_SetStaticNetwork_Help			現在管理している仮想 HUB の、スタテ�
 CMD_SetStaticNetwork_Args			SetStaticNetwork [/GATEWAY:gateway] [/SUBNET:subnet]
 CMD_SetStaticNetwork_GATEWAY		ゲートウェイの IP アドレスを設定します
 CMD_SetStaticNetwork_SUBNET			ローカル VPN ネットワークの大きさを決定するために必要なサブネットマスクを指定します。
-CMD_SetStaticNetwork_Prompt_GATEWAY	ゲートウェイ 
+CMD_SetStaticNetwork_Prompt_GATEWAY	ゲートウェイ: 
 CMD_SetStaticNetwork_Prompt_SUBNET	サブネットマスク: 
 
 
@@ -6998,6 +6997,23 @@ CMD_RemoteDisable_Args	RemoteDisable
 # ここから下は VPN Tools 用のコマンド             #
 #                                                 #
 ###################################################
+
+
+# GenX25519 コマンド
+CMD_GenX25519				Create new X25519 keypair
+CMD_GenX25519_Help			Use this to create a new X25519 keypair, which can be used for WireGuard. \nBoth the private and public key will be shown. \nThe public key can be shared and is used to identify a peer. \nAlso, it can always be retrieved from the private key using the GetPublicX25519 command. \nThe private key should be kept in a secure place and never be shared. \nIt cannot be recovered once lost.
+CMD_GenX25519_ARGS			GenX25519
+CMD_GenX25519_PRIVATE_KEY	Private key: 
+CMD_GenX25519_PUBLIC_KEY	Public key: 
+
+
+# GetPublicX25519 コマンド
+CMD_GetPublicX25519				Retrieve public X25519 key from a private one
+CMD_GetPublicX25519_Help		Use this if you have a private X25519 key and want to get its corresponding public key.
+CMD_GetPublicX25519_ARGS    	GetPublicX25519 [private]
+CMD_GetPublicX25519_[private]	The private X25519 key you want to get the corresponding public key of.
+CMD_GetPublicX25519_PRIVATE_KEY	Private key: 
+CMD_GetPublicX25519_PUBLIC_KEY	Public key: 
 
 
 # MakeCert コマンド
